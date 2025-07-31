@@ -1,0 +1,51 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Teste User Profile - NetworkUp</title>
+</head>
+<body>
+    <h1>Teste de Perfil</h1>
+    <div id="debug-info"></div>
+    <div id="user-data"></div>
+    
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        console.log('Página de teste carregando...');
+        
+        const debugDiv = document.getElementById('debug-info');
+        const userDataDiv = document.getElementById('user-data');
+        
+        // Obter parâmetro da URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const userId = urlParams.get('user');
+        
+        debugDiv.innerHTML = `
+            <p>URL: ${window.location.href}</p>
+            <p>Parâmetro user: ${userId}</p>
+            <p>Timestamp: ${new Date().toISOString()}</p>
+        `;
+        
+        if (userId) {
+            // Fazer requisição à API
+            fetch(`http://localhost:3002/api/users/${userId}`)
+                .then(response => response.json())
+                .then(data => {
+                    console.log('Dados recebidos:', data);
+                    userDataDiv.innerHTML = `
+                        <h2>Dados do Usuário:</h2>
+                        <pre>${JSON.stringify(data, null, 2)}</pre>
+                    `;
+                })
+                .catch(error => {
+                    console.error('Erro:', error);
+                    userDataDiv.innerHTML = `<p>Erro: ${error.message}</p>`;
+                });
+        } else {
+            userDataDiv.innerHTML = '<p>ID do usuário não encontrado na URL</p>';
+        }
+    });
+    </script>
+</body>
+</html>
