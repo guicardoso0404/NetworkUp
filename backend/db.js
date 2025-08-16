@@ -66,8 +66,12 @@ async function createDatabase() {
         
         const tempConnection = await mysql.createConnection(tempConfig);
         
+        // Criar o banco de dados se não existir
         await tempConnection.execute(`CREATE DATABASE IF NOT EXISTS ${dbConfig.database} CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci`);
         console.log(`Banco de dados '${dbConfig.database}' criado com sucesso!`);
+        
+        // Usar o banco de dados
+        await tempConnection.execute(`USE ${dbConfig.database}`);
         
         await tempConnection.end();
         
@@ -84,7 +88,10 @@ async function createTables() {
     try {
         console.log('Verificando/criando tabelas...');
         
-        // Tabela de usuários
+        // Habilitar verificação de chaves estrangeiras
+        await pool.execute(`SET FOREIGN_KEY_CHECKS = 1`);
+        
+        // Tabela de usuários (tabela principal)
         await pool.execute(`
             CREATE TABLE IF NOT EXISTS usuarios (
                 id INT AUTO_INCREMENT PRIMARY KEY,
@@ -93,25 +100,9 @@ async function createTables() {
                 senha VARCHAR(255) NOT NULL,
                 descricao TEXT,
                 foto_perfil TEXT,
-                ativo BOOLEAN DEFAULT true,
-                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                INDEX idx_email (email),
-                INDEX idx_ativo (ativo)
+                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
-
-        // Adicionar coluna descricao se não existir (para tabelas existentes)
-        try {
-            await pool.execute(`ALTER TABLE usuarios ADD COLUMN descricao TEXT AFTER biografia`);
-            console.log('Coluna descricao adicionada');
-        } catch (error) {
-            if (error.code === 'ER_DUP_FIELDNAME') {
-                console.log('Coluna descricao já existe');
-            } else {
-                console.log('Erro ao adicionar coluna descricao:', error.message);
-            }
-        }
 
         // Tabela de postagens
         await pool.execute(`
@@ -123,12 +114,7 @@ async function createTables() {
                 curtidas INT DEFAULT 0,
                 comentarios INT DEFAULT 0,
                 data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                data_atualizacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-                ativo BOOLEAN DEFAULT true,
-                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-                INDEX idx_usuario_id (usuario_id),
-                INDEX idx_data_criacao (data_criacao),
-                INDEX idx_ativo (ativo)
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
@@ -140,12 +126,8 @@ async function createTables() {
                 usuario_id INT NOT NULL,
                 conteudo TEXT NOT NULL,
                 data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
-                ativo BOOLEAN DEFAULT true,
                 FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE,
-                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-                INDEX idx_postagem_id (postagem_id),
-                INDEX idx_usuario_id (usuario_id),
-                INDEX idx_ativo (ativo)
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
@@ -158,12 +140,24 @@ async function createTables() {
                 data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
                 UNIQUE KEY unique_curtida (postagem_id, usuario_id),
                 FOREIGN KEY (postagem_id) REFERENCES postagens(id) ON DELETE CASCADE,
-                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
-                INDEX idx_postagem_id (postagem_id),
-                INDEX idx_usuario_id (usuario_id)
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
 
+        // Mostrar estatísticas do banco de dados (para log)
+        const [stats] = await pool.execute(`
+            SELECT 
+                (SELECT COUNT(*) FROM usuarios) as total_usuarios,
+                (SELECT COUNT(*) FROM postagens) as total_postagens,
+                (SELECT COUNT(*) FROM comentarios) as total_comentarios,
+                (SELECT COUNT(*) FROM curtidas) as total_curtidas
+        `);
+        
+        console.log('Estatísticas do banco de dados:');
+        console.log(`- Total de usuários: ${stats[0].total_usuarios}`);
+        console.log(`- Total de postagens: ${stats[0].total_postagens}`);
+        console.log(`- Total de comentários: ${stats[0].total_comentarios}`);
+        console.log(`- Total de curtidas: ${stats[0].total_curtidas}`);
         console.log('Tabelas criadas/verificadas com sucesso!');
         
     } catch (error) {
@@ -194,7 +188,6 @@ async function executeQuery(query, params = []) {
     }
 }
 
-// Função para limpar dados foi removida porque não estava funcionando corretamente
 
 // Função para fechar conexão com o banco de dados
 async function closeConnection() {
