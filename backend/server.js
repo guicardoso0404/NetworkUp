@@ -79,6 +79,10 @@ app.use((req, res, next) => {
 
 // ROTAS DE LOGIN E CADASTRO
 
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
+// 111111111111111111111111111 INÍCIO DA ROTA DE CADASTRO 111111111111111111111111
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
+
 // Cadastro
 app.post('/api/auth/cadastro', async (req, res) => {
     try {
@@ -113,6 +117,10 @@ app.post('/api/auth/cadastro', async (req, res) => {
         res.json({ success: false, message: 'Erro interno do servidor: ' + error.message });
     }
 });
+
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
+// 1111111111111111111111111111 FIM DA ROTA DE CADASTRO 1111111111111111111111111
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
 
 // Atualizar usuário
 app.put('/api/users/update', async (req, res) => {
@@ -194,6 +202,10 @@ app.post('/api/users/upload-avatar', profileUpload.single('avatar'), async (req,
     }
 });
 
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
+// 1111111111111111111111111111 INÍCIO DA ROTA DE LOGIN 1111111111111111111111111
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
+
 // Login
 app.post('/api/auth/login', async (req, res) => {
     try {
@@ -226,6 +238,10 @@ app.post('/api/auth/login', async (req, res) => {
         res.json({ success: false, message: 'Erro interno do servidor' });
     }
 });
+
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
+// 11111111111111111111111111111 FIM DA ROTA DE LOGIN 11111111111111111111111111
+// 111111111111111111111111111111111111111111111111111111111111111111111111111111
 
 // ===== ROTAS DE POSTAGENS =====
 
@@ -614,22 +630,22 @@ async function startServer() {
         await createDefaultAccounts();
         
         app.listen(PORT, () => {
-            console.log('\n🚀 ===== NETWORKUP SERVER =====');
-            console.log(`✅ Servidor rodando na porta ${PORT}`);
-            console.log('\n🌐 ACESSE SEU PROJETO:');
-            console.log(`   🏠 Página Inicial: http://localhost:${PORT}/home`);
-            console.log(`   🔐 Login:          http://localhost:${PORT}/login`);
-            console.log(`   📝 Cadastro:       http://localhost:${PORT}/cadastro`);
-            console.log(`   📰 Feed:           http://localhost:${PORT}/feed`);
-            console.log(`   ℹ️  Sobre:          http://localhost:${PORT}/sobre`);
-            console.log('\n🔧 DESENVOLVIMENTO:');
-            console.log(`   🔌 API:            http://localhost:${PORT}/api`);
-            console.log('\n👤 CONTAS TESTE:');
-            console.log(`   📧 Email 1:        guilherme@networkup.com.br`);
-            console.log(`   📧 Email 2:        guilherme123@networkup.com.br`);
-            console.log(`   🔑 Senha:          123456 (para ambas)`);
-            console.log('\n⚠️  IMPORTANTE: Posts e dados dessas contas são PRESERVADOS!');
-            console.log('\n💡 DICA: Ctrl+Click nos links para abrir!');
+            console.log('\nNETWORKUP SERVER');
+            console.log(`Servidor rodando na porta ${PORT}`);
+            console.log('\nACESSAR MEU PROJETO:');
+            console.log(`   Página Inicial: http://localhost:${PORT}/home`);
+            console.log(`   Login: http://localhost:${PORT}/login`);
+            console.log(`   Cadastro: http://localhost:${PORT}/cadastro`);
+            console.log(`   Feed: http://localhost:${PORT}/feed`);
+            console.log(`   Sobre: http://localhost:${PORT}/sobre`);
+            console.log('\nDESENVOLVIMENTO:');
+            console.log(`   API: http://localhost:${PORT}/api`);
+            console.log('\nCONTAS TESTE:');
+            console.log(`   Email 1: guilherme@networkup.com.br`);
+            console.log(`   Email 2: guilherme123@networkup.com.br`);
+            console.log(`   Senha: 123456 (para ambas)`);
+            console.log('\nIMPORTANTE: Posts e dados dessas contas são PRESERVADOS!');
+            console.log('\nDICA: Ctrl+Click nos links para abrir!');
             console.log('================================\n');
         });
     } catch (error) {
