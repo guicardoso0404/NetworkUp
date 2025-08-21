@@ -108,6 +108,15 @@ function setupUserMenu() {
         });
     }
     
+    // Configurar botão de chat
+    const chatBtn = document.getElementById('chatBtn');
+    if (chatBtn) {
+        chatBtn.addEventListener('click', function() {
+            console.log('💬 Redirecionando para chat...');
+            window.location.href = '/chat';
+        });
+    }
+    
     // Configurar botão de logout
     if (logoutBtn) {
         logoutBtn.addEventListener('click', function() {
