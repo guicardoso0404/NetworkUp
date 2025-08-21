@@ -55,12 +55,46 @@ SELECT id, nome, email, descricao, foto_perfil, data_criacao
 FROM usuarios 
 ORDER BY data_criacao DESC;
 
+-- Tabela de conversas (chats)
+CREATE TABLE IF NOT EXISTS conversas (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    nome VARCHAR(100), -- Nome do grupo (se for chat em grupo)
+    tipo ENUM('individual', 'grupo') DEFAULT 'individual',
+    data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabela de participantes das conversas
+CREATE TABLE IF NOT EXISTS participantes_conversa (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    conversa_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    data_entrada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('ativo', 'saiu', 'banido') DEFAULT 'ativo',
+    FOREIGN KEY (conversa_id) REFERENCES conversas(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+    UNIQUE KEY unique_participante (conversa_id, usuario_id)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Tabela de mensagens
+CREATE TABLE IF NOT EXISTS mensagens (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    conversa_id INT NOT NULL,
+    usuario_id INT NOT NULL,
+    conteudo TEXT NOT NULL,
+    data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+    status ENUM('enviada', 'entregue', 'lida', 'excluida') DEFAULT 'enviada',
+    FOREIGN KEY (conversa_id) REFERENCES conversas(id) ON DELETE CASCADE,
+    FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
 -- Mostrar estatísticas básicas
 SELECT 
     (SELECT COUNT(*) FROM usuarios) as 'Total de Usuários',
     (SELECT COUNT(*) FROM postagens) as 'Total de Postagens',
     (SELECT COUNT(*) FROM comentarios) as 'Total de Comentários',
-    (SELECT COUNT(*) FROM curtidas) as 'Total de Curtidas';
+    (SELECT COUNT(*) FROM curtidas) as 'Total de Curtidas',
+    (SELECT COUNT(*) FROM conversas) as 'Total de Conversas',
+    (SELECT COUNT(*) FROM mensagens) as 'Total de Mensagens';
 
 -- Mostrar mensagem de sucesso
 SELECT 'Banco de dados NetworkUp configurado com sucesso!' as STATUS;

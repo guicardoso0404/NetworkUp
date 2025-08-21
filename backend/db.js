@@ -143,6 +143,44 @@ async function createTables() {
                 FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
             ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
         `);
+        
+        // Tabela de conversas (chats)
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS conversas (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                nome VARCHAR(100),
+                tipo ENUM('individual', 'grupo') DEFAULT 'individual',
+                data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // Tabela de participantes das conversas
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS participantes_conversa (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                conversa_id INT NOT NULL,
+                usuario_id INT NOT NULL,
+                data_entrada TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status ENUM('ativo', 'saiu', 'banido') DEFAULT 'ativo',
+                FOREIGN KEY (conversa_id) REFERENCES conversas(id) ON DELETE CASCADE,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE,
+                UNIQUE KEY unique_participante (conversa_id, usuario_id)
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
+
+        // Tabela de mensagens
+        await pool.execute(`
+            CREATE TABLE IF NOT EXISTS mensagens (
+                id INT AUTO_INCREMENT PRIMARY KEY,
+                conversa_id INT NOT NULL,
+                usuario_id INT NOT NULL,
+                conteudo TEXT NOT NULL,
+                data_envio TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+                status ENUM('enviada', 'entregue', 'lida', 'excluida') DEFAULT 'enviada',
+                FOREIGN KEY (conversa_id) REFERENCES conversas(id) ON DELETE CASCADE,
+                FOREIGN KEY (usuario_id) REFERENCES usuarios(id) ON DELETE CASCADE
+            ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci
+        `);
 
         // Mostrar estatísticas do banco de dados (para log)
         const [stats] = await pool.execute(`
@@ -150,7 +188,9 @@ async function createTables() {
                 (SELECT COUNT(*) FROM usuarios) as total_usuarios,
                 (SELECT COUNT(*) FROM postagens) as total_postagens,
                 (SELECT COUNT(*) FROM comentarios) as total_comentarios,
-                (SELECT COUNT(*) FROM curtidas) as total_curtidas
+                (SELECT COUNT(*) FROM curtidas) as total_curtidas,
+                (SELECT COUNT(*) FROM conversas) as total_conversas,
+                (SELECT COUNT(*) FROM mensagens) as total_mensagens
         `);
         
         console.log('Estatísticas do banco de dados:');
@@ -158,6 +198,8 @@ async function createTables() {
         console.log(`- Total de postagens: ${stats[0].total_postagens}`);
         console.log(`- Total de comentários: ${stats[0].total_comentarios}`);
         console.log(`- Total de curtidas: ${stats[0].total_curtidas}`);
+        console.log(`- Total de conversas: ${stats[0].total_conversas || 0}`);
+        console.log(`- Total de mensagens: ${stats[0].total_mensagens || 0}`);
         console.log('Tabelas criadas/verificadas com sucesso!');
         
     } catch (error) {
