@@ -65,6 +65,10 @@ async function loadUserProfile() {
             const posts = result.data.posts;
             const stats = result.data.stats;
             
+            // Log para depuração do formato da data
+            console.log('🔄 USER-PROFILE: Data de criação bruta:', user.data_criacao);
+            console.log('🔄 USER-PROFILE: Tipo da data:', typeof user.data_criacao);
+            
             console.log('✅ USER-PROFILE: Perfil carregado:', user);
             console.log('✅ USER-PROFILE: Posts encontrados:', posts.length);
             
@@ -92,6 +96,8 @@ async function loadUserProfile() {
 
 // Atualizar informações do usuário
 function updateUserInfo(user, stats) {
+    console.log('🔍 Detalhes completos do usuário recebidos:', user);
+    
     // Avatar
     const userAvatar = document.getElementById('userAvatar');
     if (user.foto_perfil) {
@@ -115,12 +121,52 @@ function updateUserInfo(user, stats) {
     
     // Data de membro
     if (user.data_criacao) {
-        const memberDate = new Date(user.data_criacao);
-        const formattedDate = memberDate.toLocaleDateString('pt-BR', {
-            month: 'short',
-            year: 'numeric'
-        });
-        document.getElementById('memberSince').textContent = formattedDate;
+        try {
+            console.log('🔄 Data de criação original:', user.data_criacao);
+            
+            // Tentar formatar a data de diferentes maneiras
+            let memberDate;
+            let formattedDate;
+            
+            // Primeiro, tentar criar um objeto Date a partir da string
+            memberDate = new Date(user.data_criacao);
+            console.log('🔄 Data tentativa #1:', memberDate);
+            
+            // Se falhar ou resultar em data inválida, tentar outros formatos
+            if (isNaN(memberDate.getTime())) {
+                // Tentar formato MySQL YYYY-MM-DD HH:MM:SS
+                if (typeof user.data_criacao === 'string' && user.data_criacao.includes('-')) {
+                    const parts = user.data_criacao.split(/[- :]/);
+                    memberDate = new Date(parts[0], parts[1]-1, parts[2], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+                    console.log('🔄 Data tentativa #2:', memberDate);
+                }
+            }
+            
+            // Se a data for válida, formatar para exibição
+            if (!isNaN(memberDate.getTime())) {
+                formattedDate = memberDate.toLocaleDateString('pt-BR', {
+                    month: 'short',
+                    year: 'numeric'
+                });
+                document.getElementById('memberSince').textContent = formattedDate;
+                console.log('✅ Data formatada com sucesso:', formattedDate);
+            } else {
+                // Se nenhuma tentativa funcionou, tentar mostrar a data bruta
+                if (typeof user.data_criacao === 'string') {
+                    const simpleDate = user.data_criacao.split(' ')[0]; // Pegar apenas a parte da data
+                    document.getElementById('memberSince').textContent = simpleDate;
+                    console.log('⚠️ Usando data simplificada:', simpleDate);
+                } else {
+                    document.getElementById('memberSince').textContent = 'Data indisponível';
+                    console.error('❌ Data inválida e não processável:', user.data_criacao);
+                }
+            }
+        } catch (error) {
+            console.error('❌ Erro ao formatar data de membro:', error);
+            document.getElementById('memberSince').textContent = 'Data indisponível';
+        }
+    } else {
+        document.getElementById('memberSince').textContent = 'Data indisponível';
     }
     
     // Atualizar título da página

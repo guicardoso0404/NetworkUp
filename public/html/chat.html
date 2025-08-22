@@ -108,7 +108,14 @@
                             </div>
                         </div>
                         <div class="chat-actions">
-                            <button class="action-btn" title="Opções">⋮</button>
+                            <div class="dropdown">
+                                <button id="chatOptionsBtn" class="action-btn" title="Opções">⋮</button>
+                                <div id="chatDropdownMenu" class="dropdown-menu">
+                                    <a href="#" id="viewProfileBtn" class="dropdown-item">Ver perfil</a>
+                                    <a href="#" id="blockUserBtn" class="dropdown-item">Bloquear usuário</a>
+                                    <a href="#" id="reportBtn" class="dropdown-item">Reportar</a>
+                                </div>
+                            </div>
                         </div>
                     </div>
                     
@@ -122,7 +129,7 @@
                         <form id="messageForm">
                             <div class="message-input-container">
                                 <input type="text" id="messageInput" placeholder="Digite sua mensagem...">
-                                <button type="submit" class="send-btn" title="Enviar">
+                                <button type="submit" class="send-btn" title="Enviar mensagem">
                                     <span class="send-icon">➤</span>
                                 </button>
                             </div>

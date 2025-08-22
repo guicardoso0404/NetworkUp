@@ -274,7 +274,6 @@ function createConversationItem(conversa) {
         <div class="conversation-content">
             <div class="conversation-top">
                 <span class="conversation-name">${nomeExibicao}</span>
-                <span class="conversation-time">${timeText}</span>
             </div>
             <p class="conversation-preview">${previewText}</p>
         </div>
@@ -331,21 +330,9 @@ async function loadConversation(conversaId) {
                     </div>
                 `;
             } else {
-                // Agrupar mensagens por data
-                const messagesByDate = groupMessagesByDate(data.data);
-                
-                // Renderizar mensagens agrupadas
-                Object.keys(messagesByDate).forEach(date => {
-                    // Adicionar divisor de data
-                    const dateDivider = document.createElement('div');
-                    dateDivider.className = 'date-divider';
-                    dateDivider.textContent = formatDisplayDate(date);
-                    messagesContainer.appendChild(dateDivider);
-                    
-                    // Adicionar mensagens do dia
-                    messagesByDate[date].forEach(message => {
-                        appendMessage(message, false);
-                    });
+                // Mostrar todas as mensagens sem separadores de data
+                data.data.forEach(message => {
+                    appendMessage(message, false);
                 });
                 
                 // Rolar para a última mensagem
@@ -375,13 +362,16 @@ async function loadConversation(conversaId) {
 // Carregar informações do cabeçalho da conversa
 async function loadConversationHeader(conversaId) {
     try {
+        console.log('🔄 Carregando cabeçalho da conversa:', conversaId);
         const response = await fetch(`${API_BASE_URL}/chat/conversas/${currentUser.id}`);
         const data = await response.json();
         
         if (data.success) {
+            console.log('🔍 Todas as conversas disponíveis:', data.data);
             const conversa = data.data.find(c => c.id == conversaId);
             
             if (conversa) {
+                console.log('🔍 Conversa selecionada:', conversa);
                 const chatUserName = document.getElementById('chatUserName');
                 const chatUserAvatar = document.getElementById('chatUserAvatar').querySelector('img');
                 
@@ -390,17 +380,46 @@ async function loadConversationHeader(conversaId) {
                 
                 // Se for chat individual
                 if (conversa.tipo === 'individual' && conversa.outro_usuario) {
+                    console.log('🔍 Detalhes completos do outro usuário:', conversa.outro_usuario);
+                    
+                    // Salvar informações do usuário atual do chat para uso no dropdown
+                    // Garantir que o objeto tenha todas as propriedades necessárias
+                    currentChatUser = {
+                        id: conversa.outro_usuario.id,
+                        nome: conversa.outro_usuario.nome,
+                        email: conversa.outro_usuario.email,
+                        foto_perfil: conversa.outro_usuario.foto_perfil
+                    };
+                    
+                    // Verificar e logar informações do usuário para depuração
+                    console.log('✅ Informações do usuário atual do chat armazenadas:', currentChatUser);
+                    
                     nomeExibicao = conversa.outro_usuario.nome;
                     
                     if (conversa.outro_usuario.foto_perfil) {
                         avatarSrc = conversa.outro_usuario.foto_perfil;
                     }
+                } else {
+                    // Resetar usuário atual se não for chat individual
+                    currentChatUser = null;
+                    console.log('🔄 Resetando informações do usuário atual do chat - não é chat individual');
                 }
                 
                 chatUserName.textContent = nomeExibicao;
                 chatUserAvatar.src = avatarSrc;
                 chatUserAvatar.alt = `Avatar de ${nomeExibicao}`;
+                
+                // Configurar dropdown apenas se for chat individual
+                if (conversa.tipo === 'individual') {
+                    document.getElementById('chatOptionsBtn').style.display = 'flex';
+                } else {
+                    document.getElementById('chatOptionsBtn').style.display = 'none';
+                }
+            } else {
+                console.warn('⚠️ Conversa não encontrada:', conversaId);
             }
+        } else {
+            console.error('❌ Erro ao buscar conversas:', data.message);
         }
     } catch (error) {
         console.error('❌ Erro ao carregar cabeçalho da conversa:', error);
@@ -427,6 +446,12 @@ function groupMessagesByDate(messages) {
 // Adicionar mensagem à lista
 function appendMessage(message, scroll = true) {
     const messagesContainer = document.getElementById('messagesContainer');
+    
+    // Remover mensagem "Nenhuma mensagem ainda" se existir
+    const emptyMessage = messagesContainer.querySelector('.empty-messages');
+    if (emptyMessage) {
+        emptyMessage.remove();
+    }
     
     const messageElement = document.createElement('div');
     messageElement.className = 'message';
@@ -455,7 +480,6 @@ function appendMessage(message, scroll = true) {
     
     messageElement.innerHTML = `
         <div class="message-content">${message.conteudo}</div>
-        <div class="message-time">${formatTime(message.data_envio)}</div>
         ${avatarHtml}
     `;
     
@@ -497,6 +521,13 @@ async function handleSendMessage(event) {
     
     try {
         console.log('📤 Enviando mensagem para conversa:', activeConversationId);
+        
+        // Remover mensagem "Nenhuma mensagem ainda" se existir
+        const messagesContainer = document.getElementById('messagesContainer');
+        const emptyMessage = messagesContainer.querySelector('.empty-messages');
+        if (emptyMessage) {
+            emptyMessage.remove();
+        }
         
         // Limpar campo
         messageInput.value = '';
@@ -543,16 +574,10 @@ function showTypingIndicator(userId) {
 
 // Atualizar status das mensagens
 function updateMessagesStatus(status) {
-    const messages = document.querySelectorAll('.message.sent');
-    
-    messages.forEach(message => {
-        const messageTime = message.querySelector('.message-time');
-        
-        // Adicionar ícone de check
-        if (status === 'lida' && !messageTime.innerHTML.includes('✓')) {
-            messageTime.innerHTML = messageTime.innerHTML + ' ✓';
-        }
-    });
+    // Como removemos a exibição de horário, não é mais necessário
+    // mostrar o status de leitura da mensagem
+    // Essa função está mantida para compatibilidade com o código existente
+    console.log('Status de mensagens atualizado:', status);
 }
 
 // Configurar modal de nova conversa
@@ -752,47 +777,128 @@ function getCurrentUser() {
 
 // Formatar data para exibição (relativos)
 function formatDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const diffInMinutes = Math.floor((now - date) / (1000 * 60));
-    
-    if (diffInMinutes < 1) return 'Agora';
-    if (diffInMinutes < 60) return `${diffInMinutes}m`;
-    if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
-    if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d`;
-    
-    return date.toLocaleDateString('pt-BR');
+    try {
+        console.log('🔄 Formatando data relativa, data original:', dateString);
+        
+        // Tentar criar um objeto Date a partir da string
+        let date = new Date(dateString);
+        
+        // Verificar se a data é válida
+        if (isNaN(date.getTime())) {
+            console.log('⚠️ Data inválida para formato relativo, tentando outros formatos');
+            
+            // Tentar formato MySQL YYYY-MM-DD HH:MM:SS
+            if (typeof dateString === 'string' && dateString.includes('-')) {
+                const parts = dateString.split(/[- :]/);
+                date = new Date(parts[0], parts[1]-1, parts[2], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+                console.log('🔄 Data relativa após tentativa alternativa:', date);
+            }
+        }
+        
+        // Se ainda for inválida, retornar um valor padrão
+        if (isNaN(date.getTime())) {
+            console.error('❌ Não foi possível formatar a data relativa:', dateString);
+            return 'Agora';
+        }
+        
+        const now = new Date();
+        const diffInMinutes = Math.floor((now - date) / (1000 * 60));
+        
+        if (diffInMinutes < 1) return 'Agora';
+        if (diffInMinutes < 60) return `${diffInMinutes}m`;
+        if (diffInMinutes < 1440) return `${Math.floor(diffInMinutes / 60)}h`;
+        if (diffInMinutes < 10080) return `${Math.floor(diffInMinutes / 1440)}d`;
+        
+        return date.toLocaleDateString('pt-BR');
+    } catch (error) {
+        console.error('❌ Erro ao formatar data relativa:', error);
+        return 'Agora';
+    }
 }
 
 // Formatar data completa para divisores
 function formatDisplayDate(dateString) {
-    const date = new Date(dateString);
-    const now = new Date();
-    const yesterday = new Date();
-    yesterday.setDate(now.getDate() - 1);
-    
-    if (date.toDateString() === now.toDateString()) {
-        return 'Hoje';
+    try {
+        console.log('🔄 Formatando data para divisor, data original:', dateString);
+        
+        // Tentar criar um objeto Date a partir da string
+        let date = new Date(dateString);
+        
+        // Verificar se a data é válida
+        if (isNaN(date.getTime())) {
+            console.log('⚠️ Data inválida para divisor, tentando outros formatos');
+            
+            // Tentar formato MySQL YYYY-MM-DD HH:MM:SS
+            if (typeof dateString === 'string' && dateString.includes('-')) {
+                const parts = dateString.split(/[- :]/);
+                date = new Date(parts[0], parts[1]-1, parts[2], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+                console.log('🔄 Data para divisor após tentativa alternativa:', date);
+            }
+        }
+        
+        // Se ainda for inválida, retornar um valor padrão
+        if (isNaN(date.getTime())) {
+            console.error('❌ Não foi possível formatar a data para divisor:', dateString);
+            return 'Data não disponível';
+        }
+        
+        const now = new Date();
+        const yesterday = new Date();
+        yesterday.setDate(now.getDate() - 1);
+        
+        if (date.toDateString() === now.toDateString()) {
+            return 'Hoje';
+        }
+        
+        if (date.toDateString() === yesterday.toDateString()) {
+            return 'Ontem';
+        }
+        
+        return date.toLocaleDateString('pt-BR', {
+            day: 'numeric',
+            month: 'long',
+            year: 'numeric'
+        });
+    } catch (error) {
+        console.error('❌ Erro ao formatar data para divisor:', error);
+        return 'Data não disponível';
     }
-    
-    if (date.toDateString() === yesterday.toDateString()) {
-        return 'Ontem';
-    }
-    
-    return date.toLocaleDateString('pt-BR', {
-        day: 'numeric',
-        month: 'long',
-        year: 'numeric'
-    });
 }
 
 // Formatar horário
 function formatTime(dateString) {
-    const date = new Date(dateString);
-    return date.toLocaleTimeString('pt-BR', {
-        hour: '2-digit',
-        minute: '2-digit'
-    });
+    try {
+        console.log('🔄 Formatando horário, data original:', dateString);
+        
+        // Tentar criar um objeto Date a partir da string
+        let date = new Date(dateString);
+        
+        // Verificar se a data é válida
+        if (isNaN(date.getTime())) {
+            console.log('⚠️ Data inválida, tentando outros formatos');
+            
+            // Tentar formato MySQL YYYY-MM-DD HH:MM:SS
+            if (typeof dateString === 'string' && dateString.includes('-')) {
+                const parts = dateString.split(/[- :]/);
+                date = new Date(parts[0], parts[1]-1, parts[2], parts[3] || 0, parts[4] || 0, parts[5] || 0);
+                console.log('🔄 Data após tentativa alternativa:', date);
+            }
+        }
+        
+        // Se ainda for inválida, retornar um valor padrão
+        if (isNaN(date.getTime())) {
+            console.error('❌ Não foi possível formatar a data:', dateString);
+            return 'Agora';
+        }
+        
+        return date.toLocaleTimeString('pt-BR', {
+            hour: '2-digit',
+            minute: '2-digit'
+        });
+    } catch (error) {
+        console.error('❌ Erro ao formatar horário:', error);
+        return 'Agora';
+    }
 }
 
 // Logout
@@ -841,3 +947,94 @@ function showToast(message, type = 'info') {
         }, 300);
     }, 4000);
 }
+
+// Variável para armazenar informações do usuário atual do chat
+let currentChatUser = null;
+
+// Configurar menu dropdown e opções
+document.addEventListener('DOMContentLoaded', function() {
+    const chatOptionsBtn = document.getElementById('chatOptionsBtn');
+    const dropdownMenu = document.getElementById('chatDropdownMenu');
+    const viewProfileBtn = document.getElementById('viewProfileBtn');
+    const blockUserBtn = document.getElementById('blockUserBtn');
+    const reportBtn = document.getElementById('reportBtn');
+    
+    // Abrir/fechar dropdown ao clicar no botão de opções
+    if (chatOptionsBtn) {
+        chatOptionsBtn.addEventListener('click', function(e) {
+            e.stopPropagation();
+            dropdownMenu.classList.toggle('show');
+        });
+    }
+    
+    // Fechar dropdown ao clicar em qualquer lugar fora dele
+    document.addEventListener('click', function() {
+        if (dropdownMenu && dropdownMenu.classList.contains('show')) {
+            dropdownMenu.classList.remove('show');
+        }
+    });
+    
+    // Impedir que cliques dentro do dropdown fechem o menu
+    if (dropdownMenu) {
+        dropdownMenu.addEventListener('click', function(e) {
+            e.stopPropagation();
+        });
+    }
+    
+    // Ir para o perfil do usuário
+    if (viewProfileBtn) {
+        viewProfileBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            console.log('🔍 Tentando navegar para o perfil do usuário, dados disponíveis:', currentChatUser);
+            
+            if (currentChatUser && currentChatUser.id) {
+                console.log('✅ Navegando para o perfil do usuário:', currentChatUser.id);
+                // Navegar para a página de perfil do usuário - usando o parâmetro 'user' em vez de 'id'
+                window.location.href = `/html/user-profile.html?user=${currentChatUser.id}`;
+            } else {
+                console.error('❌ ID do usuário não encontrado para navegação');
+                showToast('Não foi possível encontrar o perfil do usuário', 'error');
+            }
+            
+            // Fechar o dropdown
+            if (dropdownMenu) dropdownMenu.classList.remove('show');
+        });
+    }
+    
+    // Bloquear usuário
+    if (blockUserBtn) {
+        blockUserBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (currentChatUser && currentChatUser.id) {
+                if (confirm(`Tem certeza que deseja bloquear ${currentChatUser.nome}?`)) {
+                    // Implementar lógica para bloquear o usuário
+                    showToast('Função não implementada ainda', 'info');
+                }
+            } else {
+                showToast('Não foi possível encontrar o usuário', 'error');
+            }
+            
+            // Fechar o dropdown
+            if (dropdownMenu) dropdownMenu.classList.remove('show');
+        });
+    }
+    
+    // Reportar usuário
+    if (reportBtn) {
+        reportBtn.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            if (currentChatUser && currentChatUser.id) {
+                // Implementar lógica para reportar o usuário
+                showToast('Função não implementada ainda', 'info');
+            } else {
+                showToast('Não foi possível encontrar o usuário', 'error');
+            }
+            
+            // Fechar o dropdown
+            if (dropdownMenu) dropdownMenu.classList.remove('show');
+        });
+    }
+});
