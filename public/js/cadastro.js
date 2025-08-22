@@ -1,4 +1,5 @@
-// Configurações da API
+// 🦟👀
+// Configurações da API1
 const API_BASE_URL = 'http://localhost:3002/api';
 
 document.addEventListener('DOMContentLoaded', function() {

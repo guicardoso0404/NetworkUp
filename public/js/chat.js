@@ -1,4 +1,5 @@
-// Configurações da API
+// 🦟👀
+// Configurações da API1
 const API_BASE_URL = 'http://localhost:3002/api';
 let currentUser = null;
 let socket = null;
@@ -274,6 +275,7 @@ function createConversationItem(conversa) {
         <div class="conversation-content">
             <div class="conversation-top">
                 <span class="conversation-name">${nomeExibicao}</span>
+                <span class="conversation-time">${timeText}</span>
             </div>
             <p class="conversation-preview">${previewText}</p>
         </div>
@@ -574,10 +576,16 @@ function showTypingIndicator(userId) {
 
 // Atualizar status das mensagens
 function updateMessagesStatus(status) {
-    // Como removemos a exibição de horário, não é mais necessário
-    // mostrar o status de leitura da mensagem
-    // Essa função está mantida para compatibilidade com o código existente
-    console.log('Status de mensagens atualizado:', status);
+    const messages = document.querySelectorAll('.message.sent');
+    
+    messages.forEach(message => {
+        const messageTime = message.querySelector('.message-time');
+        
+        // Adicionar ícone de check
+        if (status === 'lida' && !messageTime.innerHTML.includes('✓')) {
+            messageTime.innerHTML = messageTime.innerHTML + ' ✓';
+        }
+    });
 }
 
 // Configurar modal de nova conversa

@@ -1,3 +1,4 @@
+// 🦟👀
 // Configurações da API
 const API_BASE_URL = 'http://localhost:3002/api';
 let currentUser = null;
@@ -746,7 +747,7 @@ function closeImageModal() {
     modal.style.display = 'none';
 }
 
-// Expor funções de imagem globalmente
+// Expor funções de imagem globalmente1
 window.removePhoto = removePhoto;
 window.openImageModal = openImageModal;
 window.closeImageModal = closeImageModal;

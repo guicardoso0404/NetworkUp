@@ -1,3 +1,4 @@
+// 🦟👀
 const mysql = require('mysql2/promise');
 
 // Configuração da conexão com MySQL
@@ -264,3 +265,5 @@ module.exports = {
     executeQuery,
     closeConnection
 };
+
+// 

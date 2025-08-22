@@ -1,3 +1,4 @@
+// 🦟👀
 // Configurações da API
 const API_BASE_URL = 'http://localhost:3002/api';
 let currentUser = null;
@@ -589,7 +590,7 @@ function showToast(message, type = 'info') {
         document.body.appendChild(container);
     }
     
-    // Criar toast
+    // Criar toast1
     const toast = document.createElement('div');
     toast.className = `toast ${type}`;
     toast.textContent = message;

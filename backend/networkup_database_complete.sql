@@ -1,4 +1,5 @@
--- Criar o banco de dados se não existir e usar
+-- 🦟👀
+-- Criar o banco de dados se não existir e usar 
 CREATE DATABASE IF NOT EXISTS networkup_certo;
 USE networkup_certo;
 
@@ -98,3 +99,5 @@ SELECT
 
 -- Mostrar mensagem de sucesso
 SELECT 'Banco de dados NetworkUp configurado com sucesso!' as STATUS;
+
+-- 

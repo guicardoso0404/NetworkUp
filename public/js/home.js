@@ -1,3 +1,4 @@
+// 🦟👀
 // Script da página home do NetworkUp
 document.addEventListener('DOMContentLoaded', function() {
     console.log('NetworkUp - Página Home carregada');
@@ -10,7 +11,7 @@ document.addEventListener('DOMContentLoaded', function() {
         // Usuário pode navegar livremente pela home mesmo estando logado
     }
     
-    // Adicionar eventos aos botões se necessário
+    // Adicionar eventos aos botões se necessário1
     const loginBtn = document.querySelector('a[href="/login"]');
     const cadastroBtn = document.querySelector('a[href="/cadastro"]');
     const feedLink = document.querySelector('a[href="/feed"]');

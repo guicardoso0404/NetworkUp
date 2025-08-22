@@ -1,3 +1,4 @@
+// 🦟👀
 // Configurações da API
 const API_BASE_URL = 'http://localhost:3002/api';
 let currentUser = null;
@@ -402,7 +403,7 @@ function showToast(message, type = 'info') {
         toast.style.transform = 'translateX(0)';
     }, 100);
     
-    // Remover toast após 4 segundos
+    // Remover toast após 4 segundos1
     setTimeout(() => {
         toast.style.opacity = '0';
         toast.style.transform = 'translateX(100%)';
