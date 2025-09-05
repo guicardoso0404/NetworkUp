@@ -12,8 +12,16 @@ const app = express();
 const httpServer = createServer(app);
 const io = new Server(httpServer, {
     cors: {
-        origin: "*", // Em produção, limitar para origens específicas
-        methods: ["GET", "POST"]
+        origin: [
+            "http://localhost:3002", 
+            "http://localhost:3000", 
+            "http://127.0.0.1:3002",
+            "http://127.0.0.1:3000",
+            "http://networkup.local:3002",
+            "http://networkup.local:3000"
+        ],
+        methods: ["GET", "POST"],
+        credentials: true
     }
 });
 const PORT = 3002;
