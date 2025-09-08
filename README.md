@@ -180,16 +180,6 @@ npm install
 - Navegador moderno com suporte a ES6
 - Porta 3002 disponível para o servidor
 
-## 🤝 Contribuição
-
-Contribuições são bem-vindas! Para contribuir:
-
-1. Faça um fork do projeto
-2. Crie uma branch para sua feature (`git checkout -b feature/nova-funcionalidade`)
-3. Faça commit das alterações (`git commit -m 'Adiciona nova funcionalidade'`)
-4. Faça push para a branch (`git push origin feature/nova-funcionalidade`)
-5. Abra um Pull Request
-
 ## 📄 Licença
 
 MIT © Guilherme Cardoso
