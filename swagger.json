@@ -1,0 +1,1019 @@
+{
+  "_comment": "🦟👀",
+  "swagger": "2.0",
+  "info": {
+    "title": "NetworkUp API",
+    "description": "API para a rede social NetworkUp - uma plataforma para conectar pessoas e compartilhar conteúdo. Desenvolvida com Node.js, Express e MySQL, a API fornece endpoints para gerenciar usuários, postagens, comentários, curtidas e sistema de chat em tempo real.",
+    "version": "1.0.0",
+    "contact": {
+      "name": "Guilherme Cardoso",
+      "email": "guilherme@networkup.com.br"
+    }
+  },
+  "host": "localhost:3002",
+  "basePath": "/api",
+  "schemes": ["http"],
+  "consumes": ["application/json"],
+  "produces": ["application/json"],
+  "tags": [
+    {
+      "name": "Autenticação",
+      "description": "Endpoints para cadastro e login de usuários"
+    },
+    {
+      "name": "Usuários",
+      "description": "Gerenciamento de perfis de usuário"
+    },
+    {
+      "name": "Posts",
+      "description": "Criação e interação com postagens"
+    },
+    {
+      "name": "Chat",
+      "description": "Sistema de mensagens em tempo real"
+    },
+    {
+      "name": "Admin",
+      "description": "Endpoints restritos para administração"
+    }
+  ],
+  "paths": {
+    "/auth/cadastro": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Cadastrar novo usuário",
+        "description": "Cria uma nova conta de usuário na plataforma",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dados do usuário",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["nome", "email", "senha"],
+              "properties": {
+                "nome": {
+                  "type": "string",
+                  "example": "João Silva"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "joao@email.com"
+                },
+                "senha": {
+                  "type": "string",
+                  "example": "senha123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/Usuario"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/auth/login": {
+      "post": {
+        "tags": ["Autenticação"],
+        "summary": "Fazer login",
+        "description": "Autentica um usuário existente",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Credenciais de login",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["email", "senha"],
+              "properties": {
+                "email": {
+                  "type": "string",
+                  "example": "joao@email.com"
+                },
+                "senha": {
+                  "type": "string",
+                  "example": "senha123"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "usuario": {
+                      "$ref": "#/definitions/UsuarioDetalhado"
+                    },
+                    "redirectTo": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/update": {
+      "put": {
+        "tags": ["Usuários"],
+        "summary": "Atualizar perfil",
+        "description": "Atualiza as informações de perfil do usuário",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dados para atualização",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["usuario_id", "nome", "email"],
+              "properties": {
+                "usuario_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "nome": {
+                  "type": "string",
+                  "example": "João Silva Atualizado"
+                },
+                "email": {
+                  "type": "string",
+                  "example": "joao.novo@email.com"
+                },
+                "senha": {
+                  "type": "string",
+                  "example": "novaSenha123"
+                },
+                "descricao": {
+                  "type": "string",
+                  "example": "Estudante de engenharia de software"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/Usuario"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/upload-avatar": {
+      "post": {
+        "tags": ["Usuários"],
+        "summary": "Enviar foto de perfil",
+        "description": "Envia ou atualiza a foto de perfil do usuário",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "usuario_id",
+            "type": "integer",
+            "required": true,
+            "description": "ID do usuário"
+          },
+          {
+            "in": "formData",
+            "name": "avatar",
+            "type": "file",
+            "required": true,
+            "description": "Arquivo de imagem para foto de perfil (máx. 2MB)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "foto_perfil": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/{id}": {
+      "get": {
+        "tags": ["Usuários"],
+        "summary": "Obter perfil de usuário",
+        "description": "Retorna informações do perfil de um usuário específico",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "ID do usuário"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "user": {
+                      "$ref": "#/definitions/UsuarioDetalhado"
+                    },
+                    "posts": {
+                      "type": "array",
+                      "items": {
+                        "$ref": "#/definitions/Post"
+                      }
+                    },
+                    "stats": {
+                      "type": "object",
+                      "properties": {
+                        "total_posts": {
+                          "type": "integer"
+                        }
+                      }
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/postar": {
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Criar postagem",
+        "description": "Cria uma nova postagem com texto e/ou imagem",
+        "consumes": ["multipart/form-data"],
+        "parameters": [
+          {
+            "in": "formData",
+            "name": "usuario_id",
+            "type": "integer",
+            "required": true,
+            "description": "ID do usuário"
+          },
+          {
+            "in": "formData",
+            "name": "conteudo",
+            "type": "string",
+            "description": "Conteúdo textual da postagem"
+          },
+          {
+            "in": "formData",
+            "name": "photo",
+            "type": "file",
+            "description": "Imagem para a postagem (opcional, máx. 5MB)"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "$ref": "#/definitions/Post"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/feed": {
+      "get": {
+        "tags": ["Posts"],
+        "summary": "Obter feed",
+        "description": "Retorna lista de postagens para o feed",
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/PostDetalhado"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/curtir": {
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Curtir/descurtir postagem",
+        "description": "Adiciona ou remove curtida em uma postagem",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dados da curtida",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["postagem_id", "usuario_id"],
+              "properties": {
+                "postagem_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "usuario_id": {
+                  "type": "integer",
+                  "example": 2
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "postagem_id": {
+                      "type": "integer"
+                    },
+                    "usuario_id": {
+                      "type": "integer"
+                    },
+                    "acao": {
+                      "type": "string",
+                      "enum": ["curtiu", "descurtiu"]
+                    },
+                    "total_curtidas": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/comentar": {
+      "post": {
+        "tags": ["Posts"],
+        "summary": "Comentar postagem",
+        "description": "Adiciona um comentário a uma postagem",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dados do comentário",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["postagem_id", "usuario_id", "conteudo"],
+              "properties": {
+                "postagem_id": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "usuario_id": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "conteudo": {
+                  "type": "string",
+                  "example": "Ótima postagem!"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "postagem_id": {
+                      "type": "integer"
+                    },
+                    "usuario_id": {
+                      "type": "integer"
+                    },
+                    "conteudo": {
+                      "type": "string"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/posts/deletar/{id}": {
+      "delete": {
+        "tags": ["Posts"],
+        "summary": "Deletar postagem",
+        "description": "Remove uma postagem (requer ser o dono ou administrador)",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "type": "integer",
+            "required": true,
+            "description": "ID da postagem"
+          },
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dados para deletar",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["usuario_id"],
+              "properties": {
+                "usuario_id": {
+                  "type": "integer",
+                  "example": 1
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "postagem_id": {
+                      "type": "integer"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/conversas/{usuarioId}": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Obter conversas",
+        "description": "Retorna as conversas de um usuário",
+        "parameters": [
+          {
+            "name": "usuarioId",
+            "in": "path",
+            "description": "ID do usuário",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Conversa"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/mensagens/{conversaId}": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Obter mensagens",
+        "description": "Retorna mensagens de uma conversa",
+        "parameters": [
+          {
+            "name": "conversaId",
+            "in": "path",
+            "description": "ID da conversa",
+            "required": true,
+            "type": "integer"
+          },
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "description": "ID do usuário solicitante",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Mensagem"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/conversas/criar": {
+      "post": {
+        "tags": ["Chat"],
+        "summary": "Criar conversa",
+        "description": "Cria uma nova conversa individual ou grupo",
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "description": "Dados da conversa",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "required": ["usuarioId", "tipo"],
+              "properties": {
+                "usuarioId": {
+                  "type": "integer",
+                  "example": 1
+                },
+                "outroUsuarioId": {
+                  "type": "integer",
+                  "example": 2
+                },
+                "tipo": {
+                  "type": "string",
+                  "enum": ["individual", "grupo"],
+                  "example": "individual"
+                },
+                "nome": {
+                  "type": "string",
+                  "example": "Projeto de TI"
+                }
+              }
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "object",
+                  "properties": {
+                    "id": {
+                      "type": "integer"
+                    },
+                    "ja_existia": {
+                      "type": "boolean"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/chat/usuarios/buscar": {
+      "get": {
+        "tags": ["Chat"],
+        "summary": "Buscar usuários",
+        "description": "Pesquisa usuários para iniciar conversas",
+        "parameters": [
+          {
+            "name": "termo",
+            "in": "query",
+            "description": "Termo de busca",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "usuarioId",
+            "in": "query",
+            "description": "ID do usuário solicitante",
+            "required": true,
+            "type": "integer"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/Usuario"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/find/{email}": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Buscar usuário por email",
+        "description": "Retorna informações de um usuário pelo email (acesso restrito)",
+        "parameters": [
+          {
+            "name": "email",
+            "in": "path",
+            "description": "Email do usuário a buscar",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "user-email",
+            "in": "header",
+            "description": "Email do administrador solicitante",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "data": {
+                  "$ref": "#/definitions/Usuario"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/users/list": {
+      "get": {
+        "tags": ["Admin"],
+        "summary": "Listar usuários",
+        "description": "Retorna lista de todos os usuários (acesso restrito)",
+        "parameters": [
+          {
+            "name": "user-email",
+            "in": "header",
+            "description": "Email do administrador solicitante",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Operação bem-sucedida",
+            "schema": {
+              "type": "object",
+              "properties": {
+                "success": {
+                  "type": "boolean"
+                },
+                "message": {
+                  "type": "string"
+                },
+                "data": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/definitions/UsuarioDetalhado"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  },
+  "definitions": {
+    "Usuario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        }
+      }
+    },
+    "UsuarioDetalhado": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "email": {
+          "type": "string"
+        },
+        "foto_perfil": {
+          "type": "string"
+        },
+        "descricao": {
+          "type": "string"
+        },
+        "data_criacao": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "Post": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "conteudo": {
+          "type": "string"
+        },
+        "imagem": {
+          "type": "string"
+        },
+        "curtidas": {
+          "type": "integer"
+        },
+        "comentarios": {
+          "type": "integer"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
+    "PostDetalhado": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "conteudo": {
+          "type": "string"
+        },
+        "imagem": {
+          "type": "string"
+        },
+        "curtidas": {
+          "type": "integer"
+        },
+        "comentarios": {
+          "type": "integer"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "usuario_id": {
+          "type": "integer"
+        },
+        "usuario_nome": {
+          "type": "string"
+        },
+        "usuario_email": {
+          "type": "string"
+        },
+        "foto_perfil": {
+          "type": "string"
+        },
+        "comentarios_lista": {
+          "type": "array",
+          "items": {
+            "$ref": "#/definitions/Comentario"
+          }
+        }
+      }
+    },
+    "Comentario": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "conteudo": {
+          "type": "string"
+        },
+        "created_at": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "usuario_id": {
+          "type": "integer"
+        },
+        "usuario_nome": {
+          "type": "string"
+        },
+        "foto_perfil": {
+          "type": "string"
+        }
+      }
+    },
+    "Conversa": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "nome": {
+          "type": "string"
+        },
+        "tipo": {
+          "type": "string",
+          "enum": ["individual", "grupo"]
+        },
+        "data_criacao": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "outro_usuario": {
+          "$ref": "#/definitions/Usuario"
+        },
+        "ultima_mensagem": {
+          "$ref": "#/definitions/Mensagem"
+        },
+        "nao_lidas": {
+          "type": "integer"
+        }
+      }
+    },
+    "Mensagem": {
+      "type": "object",
+      "properties": {
+        "id": {
+          "type": "integer"
+        },
+        "conteudo": {
+          "type": "string"
+        },
+        "data_envio": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "status": {
+          "type": "string",
+          "enum": ["enviada", "lida"]
+        },
+        "usuario_id": {
+          "type": "integer"
+        },
+        "usuario_nome": {
+          "type": "string"
+        },
+        "foto_perfil": {
+          "type": "string"
+        }
+      }
+    }
+  },
+  "externalDocs": {
+    "description": "Página Sobre o NetworkUp",
+    "url": "/sobre"
+  }
+}

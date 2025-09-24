@@ -846,6 +846,7 @@ app.get('/api', (req, res) => {
     res.json({
         message: 'NetworkUp API está funcionando!',
         version: '1.0.0',
+        docs_url: '/api-docs',
         endpoints: {
             'POST /api/auth/cadastro': 'Cadastrar usuário',
             'POST /api/auth/login': 'Fazer login',
@@ -865,6 +866,16 @@ app.get('/api', (req, res) => {
             'GET /api/chat/usuarios/buscar': 'Buscar usuários para conversa'
         }
     });
+});
+
+// Documentação da API (Swagger)
+app.get('/api-docs', (req, res) => {
+    res.sendFile('api-docs.html', { root: '../public' });
+});
+
+// Servir o arquivo swagger.json
+app.get('/swagger.json', (req, res) => {
+    res.sendFile('swagger.json', { root: '../' });
 });
 
 
