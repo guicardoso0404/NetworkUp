@@ -59,7 +59,7 @@ async function connectDB() {
     }
 }
 
-// Função para criar o banco de dados
+// // Função para criar o banco de dados
 async function createDatabase() {
     try {
         const tempConfig = { ...dbConfig };
