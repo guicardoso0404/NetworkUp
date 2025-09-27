@@ -209,6 +209,7 @@ async function startServer() {
             console.log(`   Email 2: guilherme123@networkup.com.br`);
             console.log(`   Senha: 123456 (para ambas)`);
             console.log('\nIMPORTANTE: Posts e dados dessas contas são PRESERVADOS!');
+
         });
     } catch (error) {
         console.error('Erro ao iniciar servidor:', error);
