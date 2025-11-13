@@ -62,6 +62,26 @@ function setupUserInterface() {
         // Mostrar seção de criar post para usuários logados
         if (createPostSection) createPostSection.style.display = 'block';
         if (guestMessageSection) guestMessageSection.style.display = 'none';
+        
+        // Mostrar botão de admin se for administrador
+        if (currentUser.role === 'admin') {
+            // Remover botão existente se houver
+            const existingAdminBtn = document.querySelector('.admin-panel-btn');
+            if (existingAdminBtn) existingAdminBtn.remove();
+            
+            // Criar botão de admin
+            const adminBtn = document.createElement('button');
+            adminBtn.className = 'admin-panel-btn nav-btn';
+            adminBtn.innerHTML = '⚙️ Admin';
+            adminBtn.style.cssText = 'background: rgba(167, 192, 190, 0.2); color: #A7C0BE; margin-left: 0.5rem;';
+            adminBtn.onclick = () => window.location.href = '/admin';
+            
+            // Adicionar ao user-nav
+            const userNav = document.querySelector('.user-nav');
+            if (userNav) {
+                userNav.insertBefore(adminBtn, userNav.firstChild);
+            }
+        }
     } else {
         console.log('🔧 Configurando interface para visitante');
         

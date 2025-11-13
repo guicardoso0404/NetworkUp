@@ -12,6 +12,7 @@ const authRoutes = require('./routes/auth');
 const userRoutes = require('./routes/users');
 const postRoutes = require('./routes/posts');
 const chatRoutes = require('./routes/chat');
+const adminRoutes = require('./routes/admin');
 
 const app = express();
 const httpServer = createServer(app);
@@ -47,6 +48,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/posts', postRoutes);
 app.use('/api/chat', chatRoutes);
+app.use('/api/admin', adminRoutes);
 
 // ===== ROTAS FRONTEND =====
 
@@ -92,6 +94,11 @@ app.get('/chat', (req, res) => {
     res.sendFile('html/chat.html', { root: '../public' });
 });
 
+// Rota para painel administrativo
+app.get('/admin', (req, res) => {
+    res.sendFile('html/admin.html', { root: '../public' });
+});
+
 // ===== ROTAS DA DOCUMENTAÇÃO =====
 
 // Info da API
@@ -116,7 +123,13 @@ app.get('/api', (req, res) => {
             'GET /api/chat/conversas/:usuarioId': 'Obter conversas do usuário',
             'GET /api/chat/mensagens/:conversaId': 'Obter mensagens de uma conversa',
             'POST /api/chat/conversas/criar': 'Criar nova conversa',
-            'GET /api/chat/usuarios/buscar': 'Buscar usuários para conversa'
+            'GET /api/chat/usuarios/buscar': 'Buscar usuários para conversa',
+            'GET /api/admin/stats': 'Obter estatísticas do sistema (admin)',
+            'GET /api/admin/users': 'Listar todos os usuários (admin)',
+            'GET /api/admin/users/:userId': 'Detalhes de usuário específico (admin)',
+            'POST /api/admin/users/:userId/ban': 'Banir usuário (admin)',
+            'POST /api/admin/users/:userId/unban': 'Desbanir usuário (admin)',
+            'DELETE /api/admin/posts/:postId': 'Deletar postagem (admin)'
         }
     });
 });
@@ -151,13 +164,15 @@ async function createDefaultAccounts() {
                 nome: 'Guilherme Cardoso',
                 email: 'guilherme@networkup.com.br',
                 senha: '123456',
-                descricao: 'Desenvolvedor Full Stack e criador do NetworkUp'
+                descricao: 'Desenvolvedor Full Stack e criador do NetworkUp',
+                role: 'admin'
             },
             {
                 nome: 'Guilherme Test',
                 email: 'guilherme123@networkup.com.br', 
                 senha: '123456',
-                descricao: 'Conta de teste secundária'
+                descricao: 'Conta de teste secundária',
+                role: 'user'
             }
         ];
         
@@ -166,10 +181,17 @@ async function createDefaultAccounts() {
             
             if (existing.length === 0) {
                 await executeQuery(`
-                    INSERT INTO usuarios (nome, email, senha, descricao)
-                    VALUES (?, ?, ?, ?)
-                `, [account.nome, account.email, account.senha, account.descricao]);
-                console.log(`Conta padrão criada: ${account.email}`);
+                    INSERT INTO usuarios (nome, email, senha, descricao, role)
+                    VALUES (?, ?, ?, ?, ?)
+                `, [account.nome, account.email, account.senha, account.descricao, account.role]);
+                console.log(`Conta padrão criada: ${account.email} (${account.role})`);
+            } else {
+                // Atualizar role se já existir
+                await executeQuery(
+                    'UPDATE usuarios SET role = ? WHERE email = ?',
+                    [account.role, account.email]
+                );
+                console.log(`Role atualizada: ${account.email} (${account.role})`);
             }
         }
     } catch (error) {

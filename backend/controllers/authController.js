@@ -18,18 +18,21 @@ class AuthController {
                 return res.json({ success: false, message: 'Este email já está cadastrado' });
             }
             
+            // Determinar role (admin para guilherme@networkup.com.br)
+            const role = email === 'guilherme@networkup.com.br' ? 'admin' : 'user';
+            
             // Inserir usuário 
             const result = await executeQuery(`
-                INSERT INTO usuarios (nome, email, senha)
-                VALUES (?, ?, ?)
-            `, [nome, email, senha]);
+                INSERT INTO usuarios (nome, email, senha, role)
+                VALUES (?, ?, ?, ?)
+            `, [nome, email, senha, role]);
             
-            console.log('Usuário cadastrado:', { id: result.insertId, nome, email });
+            console.log('Usuário cadastrado:', { id: result.insertId, nome, email, role });
             
             res.json({
                 success: true,
                 message: 'Usuário cadastrado com sucesso!',
-                data: { id: result.insertId, nome, email }
+                data: { id: result.insertId, nome, email, role }
             });
             
         } catch (error) {
@@ -56,7 +59,17 @@ class AuthController {
             }
             
             const user = users[0];
-            console.log('Login sucesso:', { id: user.id, nome: user.nome, email: user.email });
+            
+            // Verificar status do usuário
+            if (user.status === 'banido') {
+                return res.json({ success: false, message: 'Sua conta foi banida. Entre em contato com o suporte.' });
+            }
+            
+            if (user.status === 'suspenso') {
+                return res.json({ success: false, message: 'Sua conta está suspensa temporariamente.' });
+            }
+            
+            console.log('Login sucesso:', { id: user.id, nome: user.nome, email: user.email, role: user.role });
             delete user.senha; // Remover senha da resposta
             
             res.json({

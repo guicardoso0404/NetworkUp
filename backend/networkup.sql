@@ -14,8 +14,13 @@ CREATE TABLE IF NOT EXISTS usuarios (
     senha VARCHAR(255) NOT NULL,
     descricao TEXT,
     foto_perfil TEXT,
+    role ENUM('admin', 'user') DEFAULT 'user',
+    status ENUM('ativo', 'banido', 'suspenso') DEFAULT 'ativo',
     data_criacao TIMESTAMP DEFAULT CURRENT_TIMESTAMP
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+-- Definir guilherme@networkup.com.br como admin (executar após inserir o usuário)
+-- UPDATE usuarios SET role = 'admin' WHERE email = 'guilherme@networkup.com.br';
 
 -- Tabela de postagens
 CREATE TABLE IF NOT EXISTS postagens (
