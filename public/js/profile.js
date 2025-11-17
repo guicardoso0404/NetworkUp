@@ -147,8 +147,8 @@ function displayUserPosts(posts) {
             
             <div class="post-meta">
                 <div class="post-stats">
-                    <span>❤️ ${post.curtidas || 0}</span>
-                    <span>💬 ${post.comentarios || 0}</span>
+                    <span><i class="bi bi-heart-fill"></i> ${post.curtidas || 0}</span>
+                    <span><i class="bi bi-chat-left-text-fill"></i> ${post.comentarios || 0}</span>
                 </div>
                 <div class="post-date">
                     ${formatDate(post.created_at)}
@@ -241,9 +241,9 @@ function renderUserPosts(posts) {
                 <p>${escapeHtml(post.conteudo)}</p>
             </div>
             <div class="post-stats">
-                <span>❤️ ${post.curtidas || 0}</span>
-                <span>💬 ${post.comentarios_lista ? post.comentarios_lista.length : 0}</span>
-                <span>📅 ${formatDate(post.created_at)}</span>
+                <span><i class="bi bi-heart-fill"></i> ${post.curtidas || 0}</span>
+                <span><i class="bi bi-chat-left-text-fill"></i> ${post.comentarios_lista ? post.comentarios_lista.length : 0}</span>
+                <span><i class="bi bi-calendar-fill"></i> ${formatDate(post.created_at)}</span>
             </div>
         </div>
     `).join('');

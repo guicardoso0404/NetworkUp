@@ -368,7 +368,7 @@ function displayPosts(posts) {
         <div class="post-card-admin">
             <div class="post-header-admin">
                 <div class="post-author-admin">
-                    <div class="post-author-avatar">👤</div>
+                    <div class="post-author-avatar"><i class="bi bi-person-circle"></i></div>
                     <div class="post-author-info">
                         <h4>${post.usuario_nome || 'Usuário'}</h4>
                         <p>${formatDate(post.created_at)}</p>
@@ -380,11 +380,11 @@ function displayPosts(posts) {
                 ${post.imagem ? `<img src="${post.imagem}" alt="Imagem do post" style="max-width: 100%; border-radius: 12px; margin-top: 1rem;">` : ''}
             </div>
             <div class="post-stats-admin">
-                <span>❤️ ${post.curtidas} curtidas</span>
-                <span>💬 ${post.comentarios} comentários</span>
+                <span><i class="bi bi-heart-fill"></i> ${post.curtidas} curtidas</span>
+                <span><i class="bi bi-chat-left-text-fill"></i> ${post.comentarios} comentários</span>
             </div>
             <div class="post-actions-admin">
-                <button onclick="deletePost(${post.id}, '${post.usuario_nome}')" class="btn-danger btn-small">Deletar Post</button>
+                <button onclick="deletePost(${post.id}, '${post.usuario_nome}')" class="btn-danger btn-small"><i class="bi bi-trash-fill"></i> Deletar Post</button>
             </div>
         </div>
     `).join('');

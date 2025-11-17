@@ -469,6 +469,10 @@ body {
     font-size: 0.9rem;
 }
 
+.action-btn i {
+    font-size: 1.1rem;
+}
+
 .action-btn:hover {
     background: rgba(167, 192, 190, 0.2);
     color: #D7D4CC;
@@ -1273,6 +1277,13 @@ body {
     transition: all 0.3s ease;
     color: #dc2626;
     opacity: 0.7;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.delete-btn i {
+    font-size: 1.1rem;
 }
 
 .delete-btn:hover {
@@ -1314,6 +1325,10 @@ body {
     gap: 0.5rem;
 }
 
+.photo-btn i {
+    font-size: 1.2rem;
+}
+
 .photo-btn:hover {
     background: rgba(167, 192, 190, 0.3);
     transform: translateY(-2px);
@@ -1351,6 +1366,10 @@ body {
     align-items: center;
     justify-content: center;
     transition: all 0.3s ease;
+}
+
+.remove-photo i {
+    font-size: 0.9rem;
 }
 
 .remove-photo:hover {

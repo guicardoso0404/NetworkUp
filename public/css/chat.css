@@ -204,6 +204,10 @@ button {
     gap: 0.5rem;
 }
 
+.nav-btn i {
+    font-size: 1rem;
+}
+
 .nav-btn:hover {
     background: rgba(167, 192, 190, 0.3);
     transform: translateY(-2px);
@@ -679,6 +683,11 @@ button {
     color: #D7D4CC;
     background: rgba(167, 192, 190, 0.1);
     cursor: pointer;
+    border: none;
+}
+
+.action-btn i {
+    font-size: 1.2rem;
 }
 
 .action-btn:hover {
@@ -946,6 +955,10 @@ button {
     box-shadow: 0 4px 16px rgba(167, 192, 190, 0.4);
     border: none;
     margin-right: 4px;
+}
+
+.send-btn i {
+    font-size: 1.1rem;
 }
 
 .send-btn:hover {

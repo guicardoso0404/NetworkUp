@@ -183,8 +183,15 @@ body {
     cursor: pointer;
     transition: all 0.3s ease;
     text-decoration: none;
-    display: inline-block;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
     text-align: center;
+}
+
+.btn i {
+    font-size: 1.1rem;
 }
 
 .btn-primary {
@@ -262,6 +269,10 @@ body {
     text-align: center;
 }
 
+.link-icon i {
+    font-size: 1.2rem;
+}
+
 /* Main Profile Area */
 .profile-main {
     background: #D7D4CC;
@@ -288,6 +299,13 @@ body {
     border-radius: 8px 8px 0 0;
     transition: all 0.3s ease;
     position: relative;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.tab-button i {
+    font-size: 1.1rem;
 }
 
 .tab-button:hover {
@@ -826,6 +844,13 @@ body {
     font-size: 1.2rem;
     transition: all 0.3s ease;
     box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.change-avatar-btn i {
+    font-size: 1.1rem;
 }
 
 .change-avatar-btn:hover {

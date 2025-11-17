@@ -72,7 +72,7 @@ function setupUserInterface() {
             // Criar botão de admin
             const adminBtn = document.createElement('button');
             adminBtn.className = 'admin-panel-btn nav-btn';
-            adminBtn.innerHTML = '⚙️ Admin';
+            adminBtn.innerHTML = '<i class="bi bi-gear-fill"></i> Admin';
             adminBtn.style.cssText = 'background: rgba(167, 192, 190, 0.2); color: #A7C0BE; margin-left: 0.5rem;';
             adminBtn.onclick = () => window.location.href = '/admin';
             
@@ -289,7 +289,7 @@ function renderPosts(posts) {
                 ${canDeletePost(post) ? `
                     <div class="post-menu">
                         <button class="delete-btn" onclick="deletePost(${post.id})" title="Deletar postagem">
-                            🗑️
+                            <i class="bi bi-trash-fill"></i>
                         </button>
                     </div>
                 ` : ''}
@@ -307,13 +307,13 @@ function renderPosts(posts) {
             
             <div class="post-actions">
                 <button class="action-btn like-btn" onclick="toggleLike(${post.id})" ${!currentUser ? 'disabled title="Faça login para curtir"' : ''}>
-                    ❤️ <span>${post.curtidas || 0}</span>
+                    <i class="bi bi-heart-fill"></i> <span>${post.curtidas || 0}</span>
                 </button>
                 <button class="action-btn comment-btn" onclick="toggleComments(${post.id})">
-                    💬 <span>${post.comentarios_lista ? post.comentarios_lista.length : 0}</span>
+                    <i class="bi bi-chat-left-text-fill"></i> <span>${post.comentarios_lista ? post.comentarios_lista.length : 0}</span>
                 </button>
                 <button class="action-btn share-btn" onclick="sharePost(${post.id})">
-                    📤 Compartilhar
+                    <i class="bi bi-share-fill"></i> Compartilhar
                 </button>
             </div>
             
